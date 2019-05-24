@@ -47,11 +47,9 @@ echo %PRIVATE_IP% proxy.local >> C:\windows\system32\drivers\etc\hosts
 docker create --name windowsfiles %ORG%/ucp-kube-binaries-win:%TAG%
 docker cp windowsfiles:/bin/containerd.exe .
 docker cp windowsfiles:/bin/ctr.exe .
-docker cp windowsfiles:/windows/system32/HostNetSvc.dll .
-docker cp windowsfiles:/bin/containerd-shim-process-v1.exe .
+docker cp windowsfiles:/windows/system32/HostNetSvc.dll C:\Windows\System32\
 docker cp windowsfiles:/bin/containerd-shim-process-v1.exe C:\windows\system32\
 mkdir C:\k\cni
-move HostNetSvc.dll C:\Windows\System32
 
 :: Restart the Windows Server:
 Bcdedit /set testsigning on
@@ -65,9 +63,29 @@ powershell -c "Start-Service containerd"
 ctr.exe -n com.docker.ucp images pull -u %REGISTRY_USERNAME%:%REGISTRY_PASSWORD% docker.io/%ORG%/ucp-kube-binaries-win:%TAG%
 ```
 
+On the VMs in the Kubernetes cluster, the store the service principal credentials in the file `C:\etc\kubernetes\azure.json`. 
 
+## Install UCP on Linux Manager
+More info can be found at [Install UCP on Azure](https://docs.docker.com/ee/ucp/admin/install/install-on-azure/)
+With the same tags listed in the above section, here is the install command:
 
-## Demo
+```bash
+export TAG=3.3.0-45d6c4c
+export ORG=dockereng
+[[ $ORG == docker ]] && export DEV_IMAGE='' || export DEV_IMAGE='--image-version dev:'
+docker container run --rm -it \
+  --name ucp \
+  --volume /var/run/docker.sock:/var/run/docker.sock \
+  ${ORG}/ucp:${TAG} install $(echo $DEV_IMAGE) \
+  --host-address <ucp-ip> \
+  --pod-cidr <ip-address-range> \
+  --cloud-provider Azure \
+  --unmanaged-cni \
+  --interactive
+  
+```
+
+## Test
 Log in to UCP with the creditials `admin`/`or*****`, we should be able to see there are 1 windows node and 1 linux node, both of them are in `ready` state.
 Deploy the following service:
 
@@ -111,12 +129,6 @@ kubectl describe pods
 ```
 
 Now we can try to ping the Windows pods with each other, assuming their IP addresses are `20.0.0.5` and `20.0.0.6`.
-
-```
-docker ps | grep servercore
-```
-
-and 
 
 ```
 docker exec -it {id} cmd
