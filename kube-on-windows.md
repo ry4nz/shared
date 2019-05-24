@@ -1,7 +1,7 @@
 ## Introduction
 
 The release of Kubernetes 1.14 includes production support for scheduling Windows containers on Windows nodes in a Kubernetes cluster.  As planned, Docker Enterprise
-Universal Control Plane (UCP) will support Kubernetes for Windows containers in Q4 2019.  This document shows how one can configurate and test for this feature in Techinical Preview Release (TPR).
+Universal Control Plane (UCP) will support Kubernetes for Windows containers in Q4 2019.  This document shows how one can configurate and test for this feature in Techinical Preview.
 
 ## Minimum Requirement
 In the following we show an example for Azure, it will also work on other Cloud platforms such as AWS, or on-prem.  The following table lists the minimum requirement:
@@ -16,7 +16,7 @@ In the following we show an example for Azure, it will also work on other Cloud 
 
 ## Configuration on Windows Worker Nodes
 
-The following environment variables are set for Windows, they will be changed for the TPR.
+The following environment variables are set for Windows, they will be changed for the TP.
 
 ```cmd
 set TAG=3.3.0-45d6c4c
@@ -66,7 +66,7 @@ ctr.exe -n com.docker.ucp images pull -u %REGISTRY_USERNAME%:%REGISTRY_PASSWORD%
 On the VMs in the Kubernetes cluster, the store the service principal credentials in the file `C:\etc\kubernetes\azure.json`. 
 
 ## Install UCP on Linux Manager
-More info can be found at [Install UCP on Azure](https://docs.docker.com/ee/ucp/admin/install/install-on-azure/)
+More info can be found at [Install UCP on Azure](https://docs.docker.com/ee/ucp/admin/install/install-on-azure/).
 With the same tags listed in the above section, here is the install command:
 
 ```bash
